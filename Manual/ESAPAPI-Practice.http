@@ -1,0 +1,75 @@
+# Project goc: dotnet run --launch-profile http
+@baseUrl = http://localhost:5279
+
+### GET Hello
+GET {{baseUrl}}/Hello/today
+Accept: application/json
+
+### POST khong can body
+POST {{baseUrl}}/Hello/nextday
+
+### POST JSON string, khong phai object
+POST {{baseUrl}}/Hello/newscategory
+Content-Type: application/json
+
+"Sonadezi"
+
+### Doc danh sach cong viec
+GET {{baseUrl}}/SonaTask/GetAll
+Accept: application/json
+
+### Tao cong viec: co ghi du lieu, chi dung database thuc hanh
+POST {{baseUrl}}/SonaTask/Create
+Content-Type: application/json
+
+{
+  "name": "Thực hành ESAPAPI",
+  "description": "Bản ghi kiểm thử từ Manual"
+}
+
+### Validation: mong doi 400
+POST {{baseUrl}}/SonaTask/Create
+Content-Type: application/json
+
+{
+  "name": "",
+  "description": "Name bắt buộc"
+}
+
+### OpenAPI JSON, Development
+GET {{baseUrl}}/openapi/v1.json
+
+### Weather sample
+GET {{baseUrl}}/WeatherForecast
+
+# Cac request ben duoi CHI danh cho project moi o chuong 3.
+@practiceUrl = http://localhost:5280
+# Thay bang id response Create tra ve truoc khi GetById/Update/Delete.
+@categoryId = 1
+
+### Practice: Create, mong doi 201 va Location
+POST {{practiceUrl}}/NewsCategory/Create
+Content-Type: application/json
+
+{
+  "name": "Tin nội bộ",
+  "description": "Danh mục thực hành"
+}
+
+### Practice: GetAll
+GET {{practiceUrl}}/NewsCategory/GetAll
+
+### Practice: GetById
+GET {{practiceUrl}}/NewsCategory/GetById/{{categoryId}}
+
+### Practice: Update
+PUT {{practiceUrl}}/NewsCategory/Update/{{categoryId}}
+Content-Type: application/json
+
+{
+  "name": "Tin đã cập nhật",
+  "description": null
+}
+
+### Practice: Delete, mong doi 204, chi xoa ban ghi thuc hanh
+DELETE {{practiceUrl}}/NewsCategory/Delete/{{categoryId}}

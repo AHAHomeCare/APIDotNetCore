@@ -1,0 +1,6 @@
+@ESAPAPI_HostAddress = http://localhost:5279
+
+GET {{ESAPAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
