@@ -3,14 +3,11 @@ using ESAPAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Render provides the public port through the PORT environment variable.
-// Use 10000 locally when PORT is not set.
-var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
-builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
-
+// Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
+// Allow Flutter/mobile/web clients to call this API.
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -22,6 +19,7 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Register SQLite DbContext.
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(
         builder.Configuration.GetConnectionString("DefaultConnection")
@@ -30,6 +28,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
+// OpenAPI is exposed only in Development.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -38,6 +37,9 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowAll");
 app.UseAuthorization();
 
+app.MapControllers();
+
+// Simple endpoints for Render/service health checks.
 app.MapGet("/", () => Results.Ok(new
 {
     service = "ESAPAPI",
@@ -48,7 +50,5 @@ app.MapGet("/health", () => Results.Ok(new
 {
     status = "healthy"
 }));
-
-app.MapControllers();
 
 app.Run();
