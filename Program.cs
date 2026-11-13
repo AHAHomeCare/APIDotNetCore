@@ -3,31 +3,51 @@ using ESAPAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Render provides the public port through the PORT environment variable.
+// Use 10000 locally when PORT is not set.
+var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-// Register SQLite DbContext
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(
-        builder.Configuration.GetConnectionString(
-            "DefaultConnection")
+        builder.Configuration.GetConnectionString("DefaultConnection")
     )
 );
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
-
+app.UseCors("AllowAll");
 app.UseAuthorization();
+
+app.MapGet("/", () => Results.Ok(new
+{
+    service = "ESAPAPI",
+    status = "running"
+}));
+
+app.MapGet("/health", () => Results.Ok(new
+{
+    status = "healthy"
+}));
 
 app.MapControllers();
 

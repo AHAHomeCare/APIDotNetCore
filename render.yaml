@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: esapapi
+    runtime: docker
+    repo: https://github.com/AHAHomeCare/APIDotNetCore.git
+    branch: master
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
